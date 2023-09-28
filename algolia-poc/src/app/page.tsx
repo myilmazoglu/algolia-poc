@@ -1,40 +1,33 @@
 "use client";
-import { useEffect, useState } from "react";
 
-export default function Home() {
-  const [books, setBooks] = useState<any>([]);
+import algoliasearch from "algoliasearch/lite";
+import { Hits, InstantSearch, SearchBox } from "react-instantsearch";
 
-  useEffect(() => {
-    // Make an API call to your Express.js backend
-    fetch("http://localhost:3000/books")
-      .then((response) => response.json())
-      .then((data) => setBooks(data))
-      .catch((error) => console.error("Error fetching books:", error));
-  }, []);
+const searchClient = algoliasearch("", "");
 
+export default function App() {
   return (
-    <span>
-      {" "}
-      <table className="table-auto bg-green-400">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Author</th>
-            <th>Genre</th>
-            <th>Page Length</th>
-          </tr>
-        </thead>
-        <tbody>
-          {books.map((book: any) => (
-            <tr key={book.id}>
-              <td className="px-5">{book.book_name}</td>
-              <td className="px-5">{book.author}</td>
-              <td className="px-20">{book.book_category}</td>
-              <td className="px-5">{book.page_number}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </span>
+    <div className="flex justify-center w-full">
+      <div>
+        <InstantSearch
+          searchClient={searchClient}
+          indexName="book"
+          insights={true}
+        >
+          <SearchBox />
+          <Hits
+            hitComponent={(hit: any) => {
+              console.log(hit);
+              return (
+                <>
+                  <p className="text-red">{hit.hit.book_name}</p>
+                  <p className="text-red">{hit.hit.author}</p>
+                </>
+              );
+            }}
+          />
+        </InstantSearch>
+      </div>
+    </div>
   );
 }
